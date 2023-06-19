@@ -58,9 +58,9 @@ setup_args = dict(
         "jupyter_server>=1.6,<2",
         "requests~=2.25.0",
         "peewee~=3.14.0",
-        "jsonschema~=4.17.3",
+        "jsonschema~=3.2.0",
         "psutil~=5.8.0",
-        "rucio-clients==1.31.*",
+        "rucio-clients==1.30.*",
         "pyjwt"
     ],
     zip_safe=False,
