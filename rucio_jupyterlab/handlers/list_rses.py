@@ -24,6 +24,8 @@ class ListRSEsHandler(RucioAPIHandler):
         try:
             scopes = rucio.get_rses(rse_expression=rse_expression)
             self.finish(json.dumps(scopes))
-        except RucioAuthenticationException:
-            self.set_status(401)
-            self.finish(json.dumps({'error': 'authentication_error'}))
+        except Exception as e:
+            self.finish(json.dumps(e))
+        # except RucioAuthenticationException:
+        #     self.set_status(401)
+        #     self.finish(json.dumps({'error': 'authentication_error'}))
