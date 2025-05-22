@@ -14,7 +14,8 @@ import json
 from urllib.parse import urlencode, quote
 import requests
 from rucio_jupyterlab.db import get_db
-from .authenticators import RucioAuthenticationException, authenticate_userpass, authenticate_x509, authenticate_oidc
+#from .authenticators import RucioAuthenticationException, authenticate_userpass, authenticate_x509, authenticate_oidc
+from .authenticators import authenticate_userpass, authenticate_x509, authenticate_oidc
 
 
 def parse_did_filter_from_string_fe(input_string, name='*', type='collection', omit_name=False):
@@ -338,7 +339,8 @@ class RucioAPI:
         auth_type = self.auth_type
 
         if not auth_type:
-            raise RucioAuthenticationException()
+            #raise RucioAuthenticationException()
+            raise Exception("Debuging")
 
         logging.info('Attempting to authenticate using method %s...', auth_type)
 

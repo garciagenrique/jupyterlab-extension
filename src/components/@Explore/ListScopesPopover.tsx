@@ -103,6 +103,13 @@ const useStyles = createUseStyles({
   loadingIcon: {
     fontSize: '9pt',
     verticalAlign: 'middle'
+  },
+  errorMessage: {
+    background: 'var(--jp-layout-color2)',
+    color: 'red',
+    fontSize: '9pt',
+    marginTop: '8px',
+    margin: '8px 8px 16px 8px'
   }
 });
 
@@ -120,6 +127,7 @@ export const ListScopesPopover: React.FC<MyProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scopes, setScopes] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const activeInstance = useStoreState(UIStore, s => s.activeInstance);
 
   const escFunction = useCallback((event: any) => {
@@ -168,6 +176,9 @@ export const ListScopesPopover: React.FC<MyProps> = ({
             <span className={classes.iconText}>Loading...</span>
           </div>
         )}
+
+        {error && <div className={classes.errorMessage}>{error}</div>}
+
         <FixedSizeList
           height={Math.min(250, 32 * scopes.length)}
           itemCount={scopes.length}
@@ -185,13 +196,34 @@ export const ListScopesPopover: React.FC<MyProps> = ({
       return;
     }
     setLoading(true);
+    setError(null);
     actions
       .fetchScopes(activeInstance.name)
       .then(result => {
         result.sort((a, b) => a.localeCompare(b));
         setScopes(result);
       })
-      .catch(e => console.log(e)) // TODO handle error
+      .catch(e => {
+        let message = 'Error when listing available scopes.';
+        const status = e.response?.status;
+        //const error = e.response?.data?.error;
+        //const apiMessage = e.response?.data?.message;
+
+        // if (status && apiMessage && error) {
+        //   message = `Error ${status}: ${apiMessage} (${error})`;
+        // } else if (status && apiMessage) {
+        //   message = `Error ${status}: ${apiMessage}`;
+        // } else if (status && error) {
+        //   message = `Error ${status}: ${error}`;
+        // } else if (status) {
+        //   message = `Error ${status}`;
+        // } else if (e.message) {
+        //   message = e.message;
+        // }
+        message = `Error ${status}.\n full error ${e}\n. message: ${e.message}.`;
+        setError(message);
+        console.log(e);
+      })
       .finally(() => setLoading(false));
   };
 

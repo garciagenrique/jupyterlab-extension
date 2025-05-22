@@ -9,7 +9,7 @@
 
 import json
 import tornado
-from rucio_jupyterlab.rucio.authenticators import RucioAuthenticationException
+#from rucio_jupyterlab.rucio.authenticators import RucioAuthenticationException
 from rucio_jupyterlab.mode_handlers.replica import ReplicaModeHandler
 from rucio_jupyterlab.mode_handlers.download import DownloadModeHandler
 from .base import RucioAPIHandler
@@ -35,8 +35,11 @@ class DIDMakeAvailableHandler(RucioAPIHandler):
 
         try:
             output = handler.make_available(scope, name)
-        except RucioAuthenticationException:
-            self.set_status(401)
-            output = {'error': 'Authentication error'}
+        except Exception as e:
+            self.set_status(456)
+            output = e
+        #except RucioAuthenticationException:
+        #    self.set_status(401)
+        #    output = {'error': 'Authentication error'}
 
         self.finish(json.dumps(output))

@@ -9,7 +9,7 @@
 
 import json
 import tornado
-from rucio_jupyterlab.rucio.authenticators import RucioAuthenticationException
+# from rucio_jupyterlab.rucio.authenticators import RucioAuthenticationException
 from .base import RucioAPIHandler
 from rucio_jupyterlab.metrics import prometheus_metrics
 
@@ -24,6 +24,9 @@ class ListRSEsHandler(RucioAPIHandler):
         try:
             scopes = rucio.get_rses(rse_expression=rse_expression)
             self.finish(json.dumps(scopes))
-        except RucioAuthenticationException:
-            self.set_status(401)
-            self.finish(json.dumps({'error': 'authentication_error'}))
+        except Exception as e:
+            self.finish(json.dumps(e))
+            self.set_status(456)
+        # except RucioAuthenticationException:
+        #     self.set_status(401)
+        #     self.finish(json.dumps({'error': 'authentication_error'}))
