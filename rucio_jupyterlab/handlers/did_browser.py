@@ -11,7 +11,7 @@ import json
 import tornado
 from rucio_jupyterlab.db import get_db
 from rucio_jupyterlab.entity import AttachedFile
-from rucio_jupyterlab.rucio.authenticators import RucioAuthenticationException
+#from rucio_jupyterlab.rucio.authenticators import RucioAuthenticationException
 from .base import RucioAPIHandler
 from rucio_jupyterlab.metrics import prometheus_metrics
 
@@ -50,6 +50,9 @@ class DIDBrowserHandler(RucioAPIHandler):
         try:
             dids = handler.get_files(scope, name, poll)
             self.finish(json.dumps(dids))
-        except RucioAuthenticationException:
-            self.set_status(401)
-            self.finish(json.dumps({'error': 'Authentication error '}))
+        except Exception as e:
+            self.finish(json.dumps(e))
+            self.set_status(456)
+        # except RucioAuthenticationException:
+        #     self.set_status(401)
+        #     self.finish(json.dumps({'error': 'Authentication error '}))
