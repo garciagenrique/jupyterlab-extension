@@ -2,18 +2,19 @@ name: Build and Publish Extension
 
 on:
   push:
-    tags: 'v*'
+    branches: publish_gguerrie-auth-validation
 
 jobs:
-
-  Test:
-    uses: ./.github/workflows/test.yml
-    
-  Build:
-    needs: [Test]
+  Build-pypi:
+    # needs: [Test]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/publish_gguerrie-auth-validation'
     permissions:
       id-token: write
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/rucio-jupyterlab-dev
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,52 +33,87 @@ jobs:
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          skip_existing: true
+          verbose: true
+          repository-url: https://test.pypi.org/legacy/
+          # username: __token__
+          # password: ${{ secrets.TESTPYPI_GARCIAGENRIQUE }}
 
-  Build-docker:
-    needs: [Test]
-    runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
+# on:
+#   push:
+#     tags: 'v*'
+  # Test:
+  #   uses: ./.github/workflows/test.yml
+    
+  # Build:
+  #   needs: [Test]
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     id-token: write
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+        
+  #     - name: Base Setup
+  #       uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+        
+  #     - name: Custom Setup
+  #       uses: ./.github/actions/setup
+        
+  #     - name: Build sdist
+  #       run: |
+  #         pip install build
+  #         python -m build --sdist
+          
+  #     - name: Publish distribution to PyPI
+  #       uses: pypa/gh-action-pypi-publish@release/v1
+  #       with:
+  #         skip_existing: true
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # Build-docker:
+  #   needs: [Test]
+  #   runs-on: ubuntu-latest
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.10.0
+  #   permissions:
+  #     contents: read
+  #     packages: write
 
-      - name: Log into the Docker Hub
-        id: login
-        uses: docker/login-action@v3.4.0
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Extract metadata for the Docker image
-        id: metadata
-        uses: docker/metadata-action@v5.7.0
-        with:
-          flavor: |
-            latest=true
-          tags: |
-            type=semver,pattern={{raw}}
-          images: rucio/jupyterlab
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3.10.0
 
-      - name: Build and push the Docker image
-        uses: docker/build-push-action@v6.16.0
-        id: docker_build
-        with:
-          context: .
-          file: ./docker/container/Dockerfile
-          push: true
-          tags: ${{ steps.metadata.outputs.tags }}
-          labels: |
-            org.opencontainers.image.created=(date +'%Y-%m-%dT%H:%M:%SZ')
-            org.opencontainers.image.url=https://github.com/rucio/jupyterlab-extension
-            org.opencontainers.image.title=rucio-jupyterlab
-            org.opencontainers.image.description=JupyterLab extension for Rucio
-            org.opencontainers.image.version=${{ steps.metadata.outputs.tags }}
+  #     - name: Log into the Docker Hub
+  #       id: login
+  #       uses: docker/login-action@v3.4.0
+  #       with:
+  #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
+  #         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+  #     - name: Extract metadata for the Docker image
+  #       id: metadata
+  #       uses: docker/metadata-action@v5.7.0
+  #       with:
+  #         flavor: |
+  #           latest=true
+  #         tags: |
+  #           type=semver,pattern={{raw}}
+  #         images: rucio/jupyterlab
+
+  #     - name: Build and push the Docker image
+  #       uses: docker/build-push-action@v6.16.0
+  #       id: docker_build
+  #       with:
+  #         context: .
+  #         file: ./docker/container/Dockerfile
+  #         push: true
+  #         tags: ${{ steps.metadata.outputs.tags }}
+  #         labels: |
+  #           org.opencontainers.image.created=(date +'%Y-%m-%dT%H:%M:%SZ')
+  #           org.opencontainers.image.url=https://github.com/rucio/jupyterlab-extension
+  #           org.opencontainers.image.title=rucio-jupyterlab
+  #           org.opencontainers.image.description=JupyterLab extension for Rucio
+  #           org.opencontainers.image.version=${{ steps.metadata.outputs.tags }}
             
